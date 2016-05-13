@@ -56,7 +56,7 @@ void MainWindow::on_checkBox_toggled(bool checked)
 void MainWindow::on_volume_dial_valueChanged(int value)
 {
     *(short int*) &message_buf[TS_AUDIO_MSG_KEY_OFF] = C_GAIN;
-    *(int*) &message_buf[TS_AUDIO_MSG_VAL_OFF] = fixedpt_rconst(1.0) >> (15 - value);;
+    *(int*) &message_buf[TS_AUDIO_MSG_VAL_OFF] = fixedpt_rconst(0.0625) * value;
     serial->write(message_buf, TS_AUDIO_MSG_LEN);
 }
 
@@ -70,13 +70,7 @@ void MainWindow::on_delay_dial_valueChanged(int value)
 void MainWindow::on_decay_dial_valueChanged(int value)
 {
     *(short int*) &message_buf[TS_AUDIO_MSG_KEY_OFF] = C_DECAY;
-    *(int*) &message_buf[TS_AUDIO_MSG_VAL_OFF] =  fixedpt_rconst(1.0) >> (15 - value);
+    *(int*) &message_buf[TS_AUDIO_MSG_VAL_OFF] =  fixedpt_rconst(0.0625) * value;
     serial->write(message_buf, TS_AUDIO_MSG_LEN);
 }
 
-void MainWindow::on_wet_dial_valueChanged(int value)
-{
-    *(short int*) &message_buf[TS_AUDIO_MSG_KEY_OFF] = C_WET;
-    *(int*) &message_buf[TS_AUDIO_MSG_VAL_OFF] = fixedpt_rconst(1.0) >> (15 - value);
-    serial->write(message_buf, TS_AUDIO_MSG_LEN);
-}
