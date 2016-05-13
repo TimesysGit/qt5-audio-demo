@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "audio_ext.h"
+#include "fixedptc.h"
 #include <QtSerialPort/QSerialPort>
 #include <QMessageBox>
 #include <QtGui>
@@ -40,7 +42,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_checkBox_toggled(bool checked)
 {    
-    *(short int*) &message_buf[TS_AUDIO_MSG_KEY_OFF] = 0x1;
+    *(short int*) &message_buf[TS_AUDIO_MSG_KEY_OFF] = C_MUTE;
     if(checked) {
         *(int*) &message_buf[TS_AUDIO_MSG_VAL_OFF] = 0x1;
         serial->write(message_buf, TS_AUDIO_MSG_LEN);
@@ -53,7 +55,7 @@ void MainWindow::on_checkBox_toggled(bool checked)
 
 void MainWindow::on_volume_dial_valueChanged(int value)
 {
-    *(short int*) &message_buf[TS_AUDIO_MSG_KEY_OFF] = 0x0;
+    *(short int*) &message_buf[TS_AUDIO_MSG_KEY_OFF] = C_GAIN;
     /* TODO: Add log and fixed point conversion */
     *(int*) &message_buf[TS_AUDIO_MSG_VAL_OFF] = value;
     serial->write(message_buf, TS_AUDIO_MSG_LEN);
@@ -61,16 +63,24 @@ void MainWindow::on_volume_dial_valueChanged(int value)
 
 void MainWindow::on_delay_dial_valueChanged(int value)
 {
-    *(short int*) &message_buf[TS_AUDIO_MSG_KEY_OFF] = 0x2;
+    *(short int*) &message_buf[TS_AUDIO_MSG_KEY_OFF] = C_DELAY;
     /* TODO: Add log and fixed point conversion */
-    *(int*) &message_buf[TS_AUDIO_MSG_VAL_OFF] = value;
+    *(int*) &message_buf[TS_AUDIO_MSG_VAL_OFF] = (value + 1) * 512 - 1;
     serial->write(message_buf, TS_AUDIO_MSG_LEN);
 }
 
-void MainWindow::on_fade_dial_valueChanged(int value)
+void MainWindow::on_decay_dial_valueChanged(int value)
 {
-    *(short int*) &message_buf[TS_AUDIO_MSG_KEY_OFF] = 0x3;
+    *(short int*) &message_buf[TS_AUDIO_MSG_KEY_OFF] = C_DECAY;
     /* TODO: Add log and fixed point conversion */
-    *(int*) &message_buf[TS_AUDIO_MSG_VAL_OFF] = value;
+    *(int*) &message_buf[TS_AUDIO_MSG_VAL_OFF] =  fixedpt_rconst(1.0) >> (15 - value);
+    serial->write(message_buf, TS_AUDIO_MSG_LEN);
+}
+
+void MainWindow::on_wet_dial_valueChanged(int value)
+{
+    *(short int*) &message_buf[TS_AUDIO_MSG_KEY_OFF] = C_WET;
+    /* TODO: Add log and fixed point conversion */
+    *(int*) &message_buf[TS_AUDIO_MSG_VAL_OFF] = fixedpt_rconst(1.0) >> (15 - value);
     serial->write(message_buf, TS_AUDIO_MSG_LEN);
 }

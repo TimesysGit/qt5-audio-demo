@@ -30,7 +30,9 @@ private slots:
 
     void on_delay_dial_valueChanged(int value);
 
-    void on_fade_dial_valueChanged(int value);
+    void on_decay_dial_valueChanged(int value);
+
+    void on_wet_dial_valueChanged(int value);
 
 private:
     Ui::MainWindow *ui;
